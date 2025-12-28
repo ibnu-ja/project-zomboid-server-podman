@@ -1,7 +1,7 @@
 ###########################################################
 # Dockerfile that builds a Project Zomboid Gameserver
 ###########################################################
-FROM cm2network/steamcmd:root
+FROM docker.io/cm2network/steamcmd:root
 
 LABEL maintainer="daniel.carrasco@electrosoftcloud.com"
 
