@@ -152,7 +152,8 @@ fi
 if [ -n "${MOD_IDS}" ]; then
   echo "*** INFO: Found Mods including ${MOD_IDS} ***"
   # Changed delimiter to |
-  sed -i "s|Mods=.*|Mods=${MOD_IDS}|" "/root/Zomboid/Server/${SERVERNAME}.ini"
+  # escaped backslash (B42)
+  sed -i "s|Mods=.*|Mods=${MOD_IDS//\\/\\\\}|" "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 if [ -n "${WORKSHOP_IDS}" ]; then
