@@ -32,18 +32,17 @@ RUN sed -i 's/^# *\(es_ES.UTF-8\)/\1/' /etc/locale.gen \
 # Set the entry point file permissions
 RUN set -x \
   && mkdir -p "${STEAMAPPDIR}" \
-  && chown -R "${USER}:${USER}" "${STEAMAPPDIR}" \
   && bash "${STEAMCMDDIR}/steamcmd.sh" +force_install_dir "${STEAMAPPDIR}" \
   +login anonymous \
   +app_update "${STEAMAPPID}" ${STEAMAPPBRANCH:+-beta "$STEAMAPPBRANCH"} validate \
   +quit
 
 # Copy the entry point file
-COPY --chown=${USER}:${USER} scripts/entry.sh /server/scripts/entry.sh
+COPY scripts/entry.sh /server/scripts/entry.sh
 RUN chmod 550 /server/scripts/entry.sh
 
 # Copy searchfolder file
-COPY --chown=${USER}:${USER} scripts/search_folder.sh /server/scripts/search_folder.sh
+COPY scripts/search_folder.sh /server/scripts/search_folder.sh
 RUN chmod 550 /server/scripts/search_folder.sh
 
 # Create required folders to keep their permissions on mount
