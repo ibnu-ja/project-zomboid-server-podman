@@ -141,24 +141,27 @@ if [ -n "${STEAMPORT1}" ]; then
   ARGS="${ARGS} -steamport1 ${STEAMPORT1}"
 fi
 if [ -n "${STEAMPORT2}" ]; then
-  ARGS="${ARGS} -steamport2 ${STEAMPORT1}"
+  ARGS="${ARGS} -steamport2 ${STEAMPORT2}"
 fi
 
 if [ -n "${PASSWORD}" ]; then
-	sed -i "s/Password=.*/Password=${PASSWORD}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
+  # Changed delimiter to | to handle passwords with special chars
+  sed -i "s|Password=.*|Password=${PASSWORD}|" "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 if [ -n "${MOD_IDS}" ]; then
- 	echo "*** INFO: Found Mods including ${MOD_IDS} ***"
-	sed -i "s/Mods=.*/Mods=${MOD_IDS}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
+  echo "*** INFO: Found Mods including ${MOD_IDS} ***"
+  # Changed delimiter to |
+  sed -i "s|Mods=.*|Mods=${MOD_IDS}|" "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 if [ -n "${WORKSHOP_IDS}" ]; then
- 	echo "*** INFO: Found Workshop IDs including ${WORKSHOP_IDS} ***"
-	sed -i "s/WorkshopItems=.*/WorkshopItems=${WORKSHOP_IDS}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
+  echo "*** INFO: Found Workshop IDs including ${WORKSHOP_IDS} ***"
+  # Changed delimiter to |
+  sed -i "s|WorkshopItems=.*|WorkshopItems=${WORKSHOP_IDS}|" "/root/Zomboid/Server/${SERVERNAME}.ini"
 else
- 	echo "*** INFO: Workshop IDs is empty, clearing configuration ***"
-	sed -i 's/WorkshopItems=.*$/WorkshopItems=/' "/root/Zomboid/Server/${SERVERNAME}.ini"
+  echo "*** INFO: Workshop IDs is empty, clearing configuration ***"
+  sed -i 's|WorkshopItems=.*$|WorkshopItems=|' "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 # Fixes EOL in script file for good measure
@@ -173,7 +176,7 @@ if [ -e "/root/pz-dedicated/steamapps/workshop/content/108600" ]; then
 
   if [ -n "${map_list}" ]; then
     echo "*** INFO: Added maps including ${map_list} ***"
-    sed -i "s/Map=.*/Map=${map_list}Muldraugh, KY/" "/root/Zomboid/Server/${SERVERNAME}.ini"
+    sed -i "s|Map=.*|Map=${map_list}Muldraugh, KY|" "/root/Zomboid/Server/${SERVERNAME}.ini"
 
     # Checks which added maps have spawnpoints.lua files and adds them to the spawnregions file if they aren't already added
     IFS=";" read -ra strings <<< "$map_list"
@@ -194,4 +197,4 @@ fi
 # ERROR: ld.so: object 'libjsig.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
 export LD_LIBRARY_PATH="${STEAMAPPDIR}/jre64/lib:${LD_LIBRARY_PATH}"
 
-export LANG=${LANG} && export LD_LIBRARY_PATH=\"${STEAMAPPDIR}/jre64/lib:${LD_LIBRARY_PATH}\" && cd ${STEAMAPPDIR} && pwd && ./start-server.sh ${ARGS}
+export LANG=${LANG} && export LD_LIBRARY_PATH="${STEAMAPPDIR}/jre64/lib:${LD_LIBRARY_PATH}" && cd ${STEAMAPPDIR} && pwd && ./start-server.sh ${ARGS}
