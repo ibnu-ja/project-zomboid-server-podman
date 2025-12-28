@@ -1,35 +1,26 @@
 ###########################################################
 # Dockerfile that builds a Project Zomboid Gameserver
 ###########################################################
-FROM docker.io/cm2network/steamcmd:root
+FROM cm2network/steamcmd:root
 
 LABEL maintainer="daniel.carrasco@electrosoftcloud.com"
 
 ENV STEAMAPPID=380870
-ENV STEAMAPP=pz
-ENV STEAMAPPDIR="${HOMEDIR}/${STEAMAPP}-dedicated"
-# Fix for a new installation problem in the Steamcmd client
-ENV HOME="${HOMEDIR}"
-
-# Receive the value from docker-compose as an ARG
+ENV STEAMAPPDIR="/root/pz-dedicated"
 ARG STEAMAPPBRANCH=""
-# Promote the ARG value to an ENV for runtime
 ENV STEAMAPPBRANCH=$STEAMAPPBRANCH
 
-# Install required packages
+RUN chown root:root /home/steam -R
+
 RUN apt-get update \
   && apt-get install -y --no-install-recommends --no-install-suggests \
   dos2unix \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Generate locales to allow other languages in the PZ Server
 RUN sed -i 's/^# *\(es_ES.UTF-8\)/\1/' /etc/locale.gen \
   && locale-gen
 
-# Download the Project Zomboid dedicated server app using the steamcmd app
-# Set the entry point file permissions
-RUN export HOME="${HOMEDIR}"
 RUN set -x \
   && mkdir -p "${STEAMAPPDIR}" \
   && bash "${STEAMCMDDIR}/steamcmd.sh" +force_install_dir "${STEAMAPPDIR}" \
@@ -37,19 +28,16 @@ RUN set -x \
   +app_update "${STEAMAPPID}" ${STEAMAPPBRANCH:+-beta "$STEAMAPPBRANCH"} validate \
   +quit
 
-# Copy the entry point file
 COPY scripts/entry.sh /server/scripts/entry.sh
 RUN chmod 550 /server/scripts/entry.sh
 
-# Copy searchfolder file
 COPY scripts/search_folder.sh /server/scripts/search_folder.sh
 RUN chmod 550 /server/scripts/search_folder.sh
 
-# Create required folders to keep their permissions on mount
-RUN mkdir -p "${HOMEDIR}/Zomboid"
+RUN mkdir -p "/root/Zomboid"
 
 WORKDIR ${HOMEDIR}
-# Expose ports
+
 EXPOSE 16261-16262/udp \
   27015/tcp
 
