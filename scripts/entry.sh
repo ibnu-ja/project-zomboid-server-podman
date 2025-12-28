@@ -105,16 +105,16 @@ if [ -n "${SERVERPRESET}" ]; then
     echo "*** ERROR: the preset ${SERVERPRESET} doesn't exists. Please fix the configuration before start the server ***"
     exit 1
   # If SandboxVars files doesn't exists or replace is true, copy the file
-  elif [ ! -f "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua" ] || [ "${SERVERPRESETREPLACE,,}" == "true" ]; then
+  elif [ ! -f "/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua" ] || [ "${SERVERPRESETREPLACE,,}" == "true" ]; then
     echo "*** INFO: New server will be created using the preset ${SERVERPRESET} ***"
-    echo "*** Copying preset file from \"${STEAMAPPDIR}/media/lua/shared/Sandbox/${SERVERPRESET}.lua\" to \"${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua\" ***"
-    mkdir -p "${HOMEDIR}/Zomboid/Server/"
-    cp -nf "${STEAMAPPDIR}/media/lua/shared/Sandbox/${SERVERPRESET}.lua" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
-    sed -i "1s/return.*/SandboxVars = \{/" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
+    echo "*** Copying preset file from \"${STEAMAPPDIR}/media/lua/shared/Sandbox/${SERVERPRESET}.lua\" to \"/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua\" ***"
+    mkdir -p "/root/Zomboid/Server/"
+    cp -nf "${STEAMAPPDIR}/media/lua/shared/Sandbox/${SERVERPRESET}.lua" "/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
+    sed -i "1s/return.*/SandboxVars = \{/" "/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
     # Remove carriage return
-    dos2unix "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
+    dos2unix "/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
     # I have seen that the file is created in execution mode (755). Change the file mode for security reasons.
-    chmod 644 "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
+    chmod 644 "/root/Zomboid/Server/${SERVERNAME}_SandboxVars.lua"
   fi
 fi
 
@@ -145,45 +145,45 @@ if [ -n "${STEAMPORT2}" ]; then
 fi
 
 if [ -n "${PASSWORD}" ]; then
-	sed -i "s/Password=.*/Password=${PASSWORD}/" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}.ini"
+	sed -i "s/Password=.*/Password=${PASSWORD}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 if [ -n "${MOD_IDS}" ]; then
  	echo "*** INFO: Found Mods including ${MOD_IDS} ***"
-	sed -i "s/Mods=.*/Mods=${MOD_IDS}/" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}.ini"
+	sed -i "s/Mods=.*/Mods=${MOD_IDS}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 if [ -n "${WORKSHOP_IDS}" ]; then
  	echo "*** INFO: Found Workshop IDs including ${WORKSHOP_IDS} ***"
-	sed -i "s/WorkshopItems=.*/WorkshopItems=${WORKSHOP_IDS}/" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}.ini"
+	sed -i "s/WorkshopItems=.*/WorkshopItems=${WORKSHOP_IDS}/" "/root/Zomboid/Server/${SERVERNAME}.ini"
 else
  	echo "*** INFO: Workshop IDs is empty, clearing configuration ***"
-	sed -i 's/WorkshopItems=.*$/WorkshopItems=/' "${HOMEDIR}/Zomboid/Server/${SERVERNAME}.ini"
+	sed -i 's/WorkshopItems=.*$/WorkshopItems=/' "/root/Zomboid/Server/${SERVERNAME}.ini"
 fi
 
 # Fixes EOL in script file for good measure
 sed -i 's/\r$//' /server/scripts/search_folder.sh
 # Check 'search_folder.sh' script for details
-if [ -e "${HOMEDIR}/pz-dedicated/steamapps/workshop/content/108600" ]; then
+if [ -e "/root/pz-dedicated/steamapps/workshop/content/108600" ]; then
 
   map_list=""
-  source /server/scripts/search_folder.sh "${HOMEDIR}/pz-dedicated/steamapps/workshop/content/108600"
-  map_list=$(<"${HOMEDIR}/maps.txt")  
-  rm "${HOMEDIR}/maps.txt"
+  source /server/scripts/search_folder.sh "/root/pz-dedicated/steamapps/workshop/content/108600"
+  map_list=$(<"/root/maps.txt")  
+  rm "/root/maps.txt"
 
   if [ -n "${map_list}" ]; then
     echo "*** INFO: Added maps including ${map_list} ***"
-    sed -i "s/Map=.*/Map=${map_list}Muldraugh, KY/" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}.ini"
+    sed -i "s/Map=.*/Map=${map_list}Muldraugh, KY/" "/root/Zomboid/Server/${SERVERNAME}.ini"
 
     # Checks which added maps have spawnpoints.lua files and adds them to the spawnregions file if they aren't already added
     IFS=";" read -ra strings <<< "$map_list"
     for string in "${strings[@]}"; do
-        if ! grep -q "$string" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_spawnregions.lua"; then
-          if [ -e "${HOMEDIR}/pz-dedicated/media/maps/$string/spawnpoints.lua" ]; then
+        if ! grep -q "$string" "/root/Zomboid/Server/${SERVERNAME}_spawnregions.lua"; then
+          if [ -e "/root/pz-dedicated/media/maps/$string/spawnpoints.lua" ]; then
             result="{ name = \"$string\", file = \"media/maps/$string/spawnpoints.lua\" },"
             sed -i "/function SpawnRegions()/,/return {/ {    /return {/ a\
             \\\t\t$result
-            }" "${HOMEDIR}/Zomboid/Server/${SERVERNAME}_spawnregions.lua"
+            }" "/root/Zomboid/Server/${SERVERNAME}_spawnregions.lua"
           fi
         fi
     done

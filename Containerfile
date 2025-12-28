@@ -36,7 +36,7 @@ RUN chmod 550 /server/scripts/search_folder.sh
 
 RUN mkdir -p "/root/Zomboid"
 
-WORKDIR ${HOMEDIR}
+WORKDIR "/root"
 
 EXPOSE 16261-16262/udp \
   27015/tcp
